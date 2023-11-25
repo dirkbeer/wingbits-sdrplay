@@ -1,5 +1,7 @@
 ***wingbits-sdrplay***
 
+**Initial setup and testing**
+
 1. Setup wingbits
 
 2. Setup the SDRplay API
@@ -40,12 +42,13 @@ sudo systemctl restart readsb
 ```
 
 **Permanent install**
+
 7. Install dump1090
 ```bash
 sudo cp ./dump1090 /usr/bin/
 ```
 
-7. Create and install a service script to start dump1090
+7. Create a service script to start dump1090
 ```bash
 sudo nano /lib/systemd/system/dump1090.service
 ```
@@ -60,11 +63,11 @@ After=network.target sdrplay.service
 
 [Service]
 # You might want to create an EnvironmentFile if you have many variable options
-# EnvironmentFile=/etc/default/dump1090
+EnvironmentFile=/etc/default/dump1090
 User=readsb
 RuntimeDirectory=readsb
 RuntimeDirectoryMode=0755
-ExecStart=/usr/bin/dump1090 --dev-sdrplay --rsp2-antenna-portA --measure-noise --net --net-ro-port 30002 --quiet
+ExecStart=/usr/bin/dump1090 $RECEIVER_OPTIONS --quiet
 Type=simple
 Restart=always
 RestartSec=15
@@ -76,16 +79,24 @@ Nice=-5
 WantedBy=default.target
 ```
 
+8. Create a configuration file for the service
 ```bash
 sudo nano /etc/default/dump1090
 ```
 ```bash
+# dump1090 configuration
+# This is sourced by /etc/systemd/system/default.target.wants/dump1090.service as
+# daemon startup configuration.
 
+RECEIVER_OPTIONS="--dev-sdrplay --rsp2-antenna-portA --measure-noise --net --net-ro-port 30002"
 ```
 
+9. Install the service and check that it is running
 ```bash
 sudo systemctl enable dump1090.service
 sudo systemctl start dump1090.service
 sudo systemctl status dump1090
 sudo journalctl -fu dump1090.service
 ```
+
+10. Reboot

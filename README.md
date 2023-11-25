@@ -28,7 +28,15 @@ SDRPLAY=1 make dump1090
 ```bash
 ./dump1090 --dev-sdrplay --rsp2-antenna-portA --measure-noise --net --net-ro-port 30002 --quiet &
 ```
+
 5. Modify the readsb configuration
 ```bash
+#RECEIVER_OPTIONS="--device 0 --device-type rtlsdr --gain -10 --ppm 0"
+RECEIVER_OPTIONS="--net-connector 127.0.0.1,30002,raw_in"
+```
+6. Restart readsb
+```bash
+sudo systemctl restart readsb
+```
 
 

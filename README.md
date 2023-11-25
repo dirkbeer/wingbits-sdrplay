@@ -39,4 +39,41 @@ RECEIVER_OPTIONS="--net-connector 127.0.0.1,30002,raw_in"
 sudo systemctl restart readsb
 ```
 
+**Permanent install**
+7. Install dump1090
+```bash
+sudo cp ./dump1090 /usr/bin/
+```
+
+7. Create a service script to start dump1090
+```bash
+sudo nano /dump1090.service
+```
+```bash
+# dump1090 service for systemd
+
+[Unit]
+Description=dump1090 ADS-B receiver
+Documentation=https://github.com/SDRplay/dump1090
+Wants=network.target
+After=network.target sdrplay.service
+
+[Service]
+# You might want to create an EnvironmentFile if you have many variable options
+# EnvironmentFile=/etc/default/dump1090
+User=dump1090
+RuntimeDirectory=dump1090
+RuntimeDirectoryMode=0755
+ExecStart=/usr/bin/dump1090 --dev-sdrplay --rsp2-antenna-portA --measure-noise --net --net-ro-port 30002 --quiet
+Type=simple
+Restart=always
+RestartSec=15
+StartLimitInterval=60
+StartLimitBurst=5
+Nice=-5
+
+[Install]
+WantedBy=default.target
+
+```
 
